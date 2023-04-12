@@ -85,9 +85,11 @@
                         <label for="gratuity">What was the gratuity amount?</label>
                         <input type="number" id="gratuity" name="gratuity"><br><br>
                     </div>
+                    <div class="button-container">
+                        <button id="calculateBtn">Calculate</button>
+                        <button id="clearBtn">Clear</button>
+                    </div>
 
-                    <button id="calculateBtn">Calculate</button>
-                    <button id="clearBtn">Clear</button>
 
                     <div id="result" class="receipt"></div>
                     <script>
@@ -95,7 +97,7 @@
                         var people = document.getElementById("people").value;
                         var foodFields = "";
                         for (var i = 0; i < people; i++) {
-                          foodFields += '<label for="person' + (i+1) + '">Cost for person ' + (i+1) + ':</label>';
+                          foodFields += '<label for="person' + (i+1) + '">Meal cost for person ' + (i+1) + ':</label>';
                           foodFields += '<input type="number" id="person' + (i+1) + '" name="person' + (i+1) + '" required><br><br>';
                         }
                         document.getElementById("foodFields").innerHTML = foodFields;
