@@ -65,7 +65,7 @@
                     <div class="col-md-6 col-lg-4">
                         <form>
                             <label for="people">How many people are we splitting for?</label>
-                            <i class="fa-solid fa-circle-exclamation" onclick="alert('If something was shared and one or more people did NOT share, please input their meals first.')"></i>
+                            <i class="fa-solid fa-circle-exclamation" onclick="alert('If something was shared and one or more people did NOT share, please input their costs first.')"></i>
                             <input type="number" id="people" name="people" required><br><br>
                         </form>
                         <div id="foodFields"></div>
@@ -97,7 +97,7 @@
                         var people = document.getElementById("people").value;
                         var foodFields = "";
                         for (var i = 0; i < people; i++) {
-                          foodFields += '<label for="person' + (i+1) + '">Meal cost for person ' + (i+1) + ':</label>';
+                          foodFields += '<label for="person' + (i+1) + '">Individual cost for person ' + (i+1) + ':</label>';
                           foodFields += '<input type="number" id="person' + (i+1) + '" name="person' + (i+1) + '" required><br><br>';
                         }
                         document.getElementById("foodFields").innerHTML = foodFields;
@@ -279,7 +279,7 @@
                 <!-- About Section Content-->
                 <div class="row">
                     <div class="col-lg-4 ms-auto"><p class="lead">By using SplitPay, every time a friend makes a group payment, it's easy to calculate how much everyone owes!</p></div>
-                    <div class="col-lg-4 me-auto"><p class="lead">Important: If something was bought to share, and one or more did NOT share, please input their individual meal cost first!</p></div>
+                    <div class="col-lg-4 me-auto"><p class="lead">Important: If something was bought to share, and one or more did NOT share, please input their individual cost(s) first!</p></div>
                 </div>
             </div>
         </section>
