@@ -207,14 +207,33 @@
                             }
                             total += tax + gratuity;
                             var resultText = '<div class="receipt">';
-                            resultText += '<h2>Receipt</h2>';
-                            resultText += '<p>Total cost: $' + total.toFixed(2) + '</p>';
+                            resultText += '<h2>SplitPay</h2>';
+                            for (var i = 1; i <= people; i++) {
+                                var cost = Number(document.getElementById("person" + i).value);
+                                if (!isNaN(cost)) {
+                                    resultText += '<ul>Person ' + (i) + '\'s meal was $' + cost.toFixed(2) + '</ul>';
+                                }
+                            }
+                            if (share == "yes") {
+                                resultText += '<p>Shared Meal Total: $' + sharedCost.toFixed(2) + '</p>';
+                            }
                             resultText += '<p>Tax: $' + tax.toFixed(2) + '</p>';
                             resultText += '<p>Gratuity: $' + gratuity.toFixed(2) + '</p>';
+                            resultText += '<p>Total cost: $' + total.toFixed(2) + '</p>';
                             resultText += '<hr>';
                             resultText += '<ul>';
                             for (var i = 0; i < individualCosts.length; i++) {
-                                resultText += '<li>Person ' + (i + 1) + ' needs to pay $' + individualCosts[i].toFixed(2) + '</li>';
+                                let add = false;
+                                if (notShared == "yes") {
+                                    var notSharedCount = Number(document.getElementById("notSharedCount").value);
+                                        if (i < notSharedCount) {
+                                            resultText += '<li>Person ' + (i + 1) + ' (that did NOT share) needs to pay $' + individualCosts[i].toFixed(2) + '</li>';
+                                            add = true;
+                                        }
+                                }
+                                if (!add) {
+                                    resultText += '<li>Person ' + (i + 1) + ' needs to pay $' + individualCosts[i].toFixed(2) + '</li>';
+                                }
                             }
                             resultText += '</ul>';
                             resultText += '</div>';
@@ -257,7 +276,7 @@
                 </div>
                 <!-- About Section Content-->
                 <div class="row">
-                    <div class="col-lg-4 ms-auto"><p class="lead">By using SplitPay, every time a friend makes a group payment, it's super easy to calculate how much everyone owes!</p></div>
+                    <div class="col-lg-4 ms-auto"><p class="lead">By using SplitPay, every time a friend makes a group payment, it's easy to calculate how much everyone owes!</p></div>
                     <div class="col-lg-4 me-auto"><p class="lead">Important: If something was bought to share, and one or more did NOT share, please input their individual meal cost first!</p></div>
                 </div>
             </div>
