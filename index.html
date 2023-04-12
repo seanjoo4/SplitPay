@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>SplitPay - Make Splitting Group Payment Easier</title>
+        <title>SplitPay - Make Splitting Group Payments Easier</title>
         <!-- Favicon-->
         <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
         <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
@@ -27,7 +27,7 @@
                 <div class="collapse navbar-collapse" id="navbarResponsive">
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="#portfolio">Try it Out!</a></li>
-                        <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="#about">About</a></li>
+                        <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="#about">How to Use</a></li>
                     </ul>
                 </div>
             </div>
@@ -46,7 +46,7 @@
                     <div class="divider-custom-line"></div>
                 </div>
                 <!-- Masthead Subheading-->
-                <p class="masthead-subheading font-weight-light mb-0">Make Splitting Group Payment Easier</p>
+                <p class="masthead-subheading font-weight-light mb-0">Make Splitting Group Payments Easier</p>
             </div>
         </header>
         <!-- Portfolio Section-->
@@ -65,9 +65,9 @@
                     <div class="col-md-6 col-lg-4">
                         <form>
                             <label for="people">How many people are we splitting for?</label>
+                            <i class="fa-solid fa-circle-exclamation" onclick="alert('If something was shared and one or more people did NOT share, please input their meals first.')"></i>
                             <input type="number" id="people" name="people" required><br><br>
                         </form>
-
                         <div id="foodFields"></div>
                     </div>
                         <!-- Portfolio Item 6-->
@@ -78,15 +78,17 @@
                             <option value="yes">Yes</option>
                         </select><br><br>
                         <div id="shareDetails"></div>
-                        <label for="notShare">Did anyone in the group NOT share?</label>
-                        <select id="notShare" name="notShare">
-                            <option value="no">No</option>
-                            <option value="yes">Yes</option>
-                        </select><br><br>
+                        <div id="notShareDetails"></div>
+                        <div id="sharedFields"></div>
+                        <label for="tax">What was the tax amount?</label>
+                        <input type="number" id="tax" name="tax"><br><br>
+                        <label for="gratuity">What was the gratuity amount?</label>
+                        <input type="number" id="gratuity" name="gratuity"><br><br>
                     </div>
+
                     <button id="calculateBtn">Calculate</button>
 
-                    <div id="result">
+                    <div id="result"></div>
                     <script>
                       function generatePeopleFields() {
                         var people = document.getElementById("people").value;
@@ -98,35 +100,120 @@
                         document.getElementById("foodFields").innerHTML = foodFields;
                       }
 
-                      var shareDetails = document.getElementById("shareDetails");
-                      var notShareDetails = document.getElementById("notShareDetails");
-
                       document.getElementById("share").addEventListener("change", function() {
-                        if (this.value == "yes") {
+                          var shareDetails = document.getElementById("shareDetails");
+                          var notShareDetails = document.getElementById("notShareDetails");
+                          var sharedFields = document.getElementById("sharedFields");
+
+                          if (this.value == "yes") {
+                            // ask for number of shared items
                             shareDetails.innerHTML = '<label for="sharedItems">How many items did we share?</label><input type="number" id="sharedItems" name="sharedItems" required><br><br>';
 
+                            // show the "notShareDetails" div
                             notShareDetails.style.display = "block";
-                        } else {
+                            notShareDetails.innerHTML = '<label for="notShared">Did anyone in the group NOT share?</label><select id="notShared" name="notShared"><option value="no">No</option><option value="yes">Yes</option></select><br><br>';
+
+                            // add a listener to the "notShared" field
+                            document.getElementById("notShared").addEventListener("change", function() {
+                              var notShared = document.getElementById("notShared");
+                              var notSharedCount = document.getElementById("notSharedCount");
+
+                              if (notShared.value == "yes") {
+                                // ask how many people did not share
+                                notSharedCount = document.createElement("div");
+                                notSharedCount.innerHTML = '<label for="notSharedCount">How many people did not share?</label><input type="number" id="notSharedCount" name="notSharedCount"><br><br>';
+                                notShareDetails.appendChild(notSharedCount);
+                              } else {
+                                // clear the "notSharedCount" field if the user selects "no"
+                                if (notSharedCount) {
+                                  notShareDetails.removeChild(notSharedCount);
+                                }
+                              }
+                            });
+
+                            // add a listener to the "sharedItems" field
+
+                          } else {
                             shareDetails.innerHTML = "";
+                            notShareDetails.innerHTML = "";
+                            sharedFields.innerHTML = "";
                             notShareDetails.style.display = "none";
-                        }
-                      });
+                          }
+                        });
+
+                        // generate fields for shared food cost based on the number of shared items
+                        document.getElementById("shareDetails").addEventListener("input", function() {
+                          var sharedItems = document.getElementById("sharedItems").value;
+                          var sharedFields = "";
+                          for (var i = 0; i < sharedItems; i++) {
+                            sharedFields += '<label for="sharedCost' + (i+1) + '">Cost for shared item ' + (i+1) + ':</label>';
+                            sharedFields += '<input type="number" id="sharedCost' + (i+1) + '" name="sharedCost' + (i+1) + '" required><br><br>';
+                          }
+                          document.getElementById("sharedFields").innerHTML = sharedFields;
+                        });
 
 
                       function calculateCost() {
-                        var subtotal = 0;
-                        var people = document.getElementById("people").value;
+                            var subtotal = 0;
+                            var people = document.getElementById("people").value;
+                            var individualCosts = [];
 
-                        for (var i = 1; i <= people; i++) {
-                          var cost = Number(document.getElementById("person" + i).value);
-                          if (!isNaN(cost)) {
-                            subtotal += cost;
-                          }
+                            for (var i = 1; i <= people; i++) {
+                                var cost = Number(document.getElementById("person" + i).value);
+                                if (!isNaN(cost)) {
+                                    individualCosts.push(cost);
+                                    subtotal += cost;
+                                }
+                            }
+                            var share = document.getElementById("share").value;
+                            var sharedCost = 0;
+                            if (share == "yes") {
+                                var sharedItems = document.getElementById("sharedItems").value;
+                                if (sharedItems) {
+                                    for (var i = 1; i <= sharedItems; i++) {
+                                        var cost = Number(document.getElementById("sharedCost" + i).value);
+                                        if (!isNaN(cost)) {
+                                            sharedCost += cost;
+                                        }
+                                    }
+                                }
+                            }
+                            var notShared = document.getElementById("notShared");
+                            if (notShared) {
+                                notShared = document.getElementById("notShared").value;
+                            }
+                            var tax = Number(document.getElementById("tax").value);
+                            var gratuity = Number(document.getElementById("gratuity").value);
+                            var total = subtotal + sharedCost;
+                            for (var i = 0; i < individualCosts.length; i++) {
+                                if (sharedCost != 0) {
+                                    var sharedPerPerson = 0;
+                                    if (notShared == "yes") {
+                                        var notSharedCount = Number(document.getElementById("notSharedCount").value);
+                                        if (i >= notSharedCount) {
+                                            sharedPerPerson = sharedCost / (individualCosts.length - notSharedCount);
+                                            individualCosts[i] += sharedPerPerson;
+                                        }
+                                    }
+                                    else {
+                                        sharedPerPerson = sharedCost / individualCosts.length;
+                                        individualCosts[i] += sharedPerPerson;
+                                    }
+                                }
+                                var taxPerPerson = individualCosts[i] / total * tax;
+                                var gratuityPerPerson = individualCosts[i] / total * gratuity;
+                                individualCosts[i] += taxPerPerson + gratuityPerPerson;
+                            }
+                            total += tax + gratuity;
+                            var resultText = "Total cost: $" + total.toFixed(2) + "<br>Tax: $" + tax.toFixed(2) + "<br>Gratuity: $" + gratuity.toFixed(2);
+
+                            for (var i = 0; i < individualCosts.length; i++) {
+                                resultText += `<br> Person ${i + 1} needs to pay $${individualCosts[i].toFixed(2)}`;
+                            }
+
+                            document.getElementById("result").innerHTML = resultText;
                         }
 
-                        var total = subtotal.toFixed(2);
-                        document.getElementById("result").innerHTML = "Total cost: $" + total;
-                      }
 
                       document.getElementById("people").addEventListener("input", generatePeopleFields);
                       document.getElementById("calculateBtn").addEventListener("click", calculateCost);
@@ -138,7 +225,7 @@
         <section class="page-section bg-primary text-white mb-0" id="about">
             <div class="container">
                 <!-- About Section Heading-->
-                <h2 class="page-section-heading text-center text-uppercase text-white">About</h2>
+                <h2 class="page-section-heading text-center text-uppercase text-white">How to Use</h2>
                 <!-- Icon Divider-->
                 <div class="divider-custom divider-light">
                     <div class="divider-custom-line"></div>
